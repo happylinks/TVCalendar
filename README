@@ -1,0 +1,13 @@
+TVCalendar: Add your favorite shows to your calendar.
+
+This script gets your favorite shows from TheTVDB and creates an .ical file with the next airdates. 
+You can try the script at http://happylinks.nl/TVC/index.php?accountid=[your account identifier]
+
+You can import that url into your calender programs.(iPhone and Google Calender are tested and work)
+
+If you want to host the script yourself:
+
+To use this script you will have to create a API Key on http://thetvdb.com
+Put this key in apicode.txt and place it in the projectfolder next to index.php
+Then call the page like: index.php?accountid=
+where accountid is your unique Account Identifier. You can find this in your Account tab on TheTVDB.
