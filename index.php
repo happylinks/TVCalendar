@@ -26,7 +26,8 @@ $leading = "";
     return $output;
 }
 $id = $_GET["id"];
-$xmlstr = file_get_contents("http://www.thetvdb.com/api/[DEVELOPER CODE]/series/$id/all/en.xml");
+$apicode = file_get_contents("apicode.txt");
+$xmlstr = file_get_contents("http://www.thetvdb.com/api/$apicode/series/$id/all/en.xml");
 $xml = new SimpleXMLElement($xmlstr);
 foreach($xml->Episode as $episode){
 	$episodenr = $episode->EpisodeNumber;
@@ -36,19 +37,21 @@ foreach($xml->Episode as $episode){
 	$season = leading_zeros((int)$season,2);
 	$naam = $episode->EpisodeName;
 	$datum = $episode->FirstAired;
+	$formatdatum = strtotime($datum);
 	$datum = str_replace("-","",$datum);
 	$uitleg = $episode->Overview;
-	
-	if($datum <> ""){
-		$ev = new iCalendar_event;
-		$ev->add_property('summary', $xml->Series->SeriesName." | ".$naam." (S".$season."E".$episodenr.")");
-		$ev->add_property('description', $uitleg);
-		$ev->add_property('dtstart', $datum, array('value' => 'DATE'));
-		$ev->add_property('dtend', $datum, array('value' => 'DATE'));
-		$ev->add_property('dtstamp', $datum.'T120000Z');
-	}
-	if(isset($ev)){
-		$a->add_component($ev);
+	if($formatdatum >= time()){
+		if($datum <> ""){
+			$ev = new iCalendar_event;
+			$ev->add_property('summary', $xml->Series->SeriesName." | ".$naam." (S".$season."E".$episodenr.")");
+			$ev->add_property('description', urldecode($uitleg));
+			$ev->add_property('dtstart', $datum, array('value' => 'DATE'));
+			$ev->add_property('dtend', $datum, array('value' => 'DATE'));
+			$ev->add_property('dtstamp', $datum.'T120000Z');
+		}
+		if(isset($ev)){
+			$a->add_component($ev);
+		}
 	}
 }
 echo $a->serialize();
