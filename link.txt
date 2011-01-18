@@ -1,1 +1,0 @@
-http://www.thetvdb.com/api/[DEVELOPER CODE]/series/80348/all/en.xml
