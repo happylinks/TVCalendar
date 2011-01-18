@@ -1,4 +1,5 @@
 <?php
+header("Content-type: text/calendar;");
 error_reporting(E_ALL);
 include('bennu/lib/bennu.inc.php');
 $a = new iCalendar;
@@ -43,8 +44,11 @@ foreach($xml->Episode as $episode){
 	if($formatdatum >= time()){
 		if($datum <> ""){
 			$ev = new iCalendar_event;
+			$ev->add_property('uid', $id);
 			$ev->add_property('summary', $xml->Series->SeriesName." | ".$naam." (S".$season."E".$episodenr.")");
-			$ev->add_property('description', urldecode($uitleg));
+			if($uitleg <> ""){
+				$ev->add_property('description', "$uitleg");
+			}
 			$ev->add_property('dtstart', $datum, array('value' => 'DATE'));
 			$ev->add_property('dtend', $datum, array('value' => 'DATE'));
 			$ev->add_property('dtstamp', $datum.'T120000Z');
