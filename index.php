@@ -1,5 +1,5 @@
 <?php
-header("Content-type: text/calendar;");
+//header("Content-type: text/calendar;");
 error_reporting(E_ALL);
 include('bennu/lib/bennu.inc.php');
 $a = new iCalendar;
@@ -26,35 +26,37 @@ $leading = "";
     }
     return $output;
 }
-$id = $_GET["id"];
 $apicode = file_get_contents("apicode.txt");
-$xmlstr = file_get_contents("http://www.thetvdb.com/api/$apicode/series/$id/all/en.xml");
-$xml = new SimpleXMLElement($xmlstr);
-foreach($xml->Episode as $episode){
-	$episodenr = $episode->EpisodeNumber;
-	$episodenr = leading_zeros((int)$episodenr,2);
-	$id = $episode->id;
-	$season = $episode->Combined_season;
-	$season = leading_zeros((int)$season,2);
-	$naam = $episode->EpisodeName;
-	$datum = $episode->FirstAired;
-	$formatdatum = strtotime($datum);
-	$datum = str_replace("-","",$datum);
-	$uitleg = $episode->Overview;
-	if($formatdatum >= (time()-604800)){
-		if($datum <> ""){
-			$ev = new iCalendar_event;
-			$ev->add_property('uid', $id);
-			$ev->add_property('summary', $xml->Series->SeriesName." | ".$naam." (S".$season."E".$episodenr.")");
-			if($uitleg <> ""){
-				$ev->add_property('description', "$uitleg");
+$fav = file_get_contents("http://www.thetvdb.com/api/User_Favorites.php?accountid=".$_GET["accountid"]);
+$favxml = new SimpleXMLElement($fav);
+
+foreach($favxml->Series as $id){
+	$xmlstr = file_get_contents("http://www.thetvdb.com/api/$apicode/series/$id/all/en.xml");
+	$xml = new SimpleXMLElement($xmlstr);
+	foreach($xml->Episode as $episode){
+		$episodenr = $episode->EpisodeNumber;
+		$episodenr = leading_zeros((int)$episodenr,2);
+		$id = $episode->id;
+		$season = $episode->Combined_season;
+		$season = leading_zeros((int)$season,2);
+		$naam = $episode->EpisodeName;
+		$datum = $episode->FirstAired;
+		$formatdatum = strtotime($datum);
+		$datum = str_replace("-","",$datum);
+		$uitleg = $episode->Overview;
+		if($formatdatum >= (time()-604800)){
+			if($datum <> ""){
+				$ev = new iCalendar_event;
+				$ev->add_property('uid', $id);
+				$ev->add_property('summary', $xml->Series->SeriesName." | ".$naam." (S".$season."E".$episodenr.")");
+				if($uitleg <> ""){
+					$ev->add_property('description', "$uitleg");
+				}
+				$ev->add_property('dtstart', $datum, array('value' => 'DATE'));
+				$ev->add_property('dtend', $datum, array('value' => 'DATE'));
+				$ev->add_property('dtstamp', $datum.'T120000Z');
+				$a->add_component($ev);
 			}
-			$ev->add_property('dtstart', $datum, array('value' => 'DATE'));
-			$ev->add_property('dtend', $datum, array('value' => 'DATE'));
-			$ev->add_property('dtstamp', $datum.'T120000Z');
-		}
-		if(isset($ev)){
-			$a->add_component($ev);
 		}
 	}
 }

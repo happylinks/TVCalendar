@@ -246,7 +246,7 @@ class iCalendar_property_prodid extends iCalendar_property {
     var $val_default = NULL;
 
     function construct() {
-        $this->val_default = '-//TVCalendar '._BENNU_VERSION.'//EN';
+        $this->val_default = '-//TVCalendar '.time().'//EN';
 
         $this->valid_parameters = array(
             RFC2445_XNAME => RFC2445_OPTIONAL
