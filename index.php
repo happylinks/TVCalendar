@@ -41,7 +41,7 @@ foreach($xml->Episode as $episode){
 	$formatdatum = strtotime($datum);
 	$datum = str_replace("-","",$datum);
 	$uitleg = $episode->Overview;
-	if($formatdatum >= time()){
+	if($formatdatum >= (time()-604800)){
 		if($datum <> ""){
 			$ev = new iCalendar_event;
 			$ev->add_property('uid', $id);
