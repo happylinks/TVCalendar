@@ -32,6 +32,10 @@ $favxml = new SimpleXMLElement($fav);
 
 foreach($favxml->Series as $id){
 	$xmlstr = file_get_contents("http://www.thetvdb.com/api/$apicode/series/$id/all/en.xml");
+	if($xmlstr === false) {
+		error_log("Serie " + $apicode + "couldn't be fetched");
+		break;
+	}
 	$xml = new SimpleXMLElement($xmlstr);
 	foreach($xml->Episode as $episode){
 		$episodenr = $episode->EpisodeNumber;
